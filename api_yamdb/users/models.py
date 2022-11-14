@@ -19,3 +19,16 @@ class User(AbstractUser):
                             default='user',
                             max_length=9
                             )
+
+    is_active = models.BooleanField(
+        'active',
+        default=False,
+        help_text=(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    confirmation_code = models.TextField('Код подтверждения',
+                                         blank=True,
+                                         null=True
+                                         )
