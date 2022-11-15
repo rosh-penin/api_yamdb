@@ -148,4 +148,7 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
+# Local emails dir
+api_yamdb/sent_emails/
+
 /api_yamdb/reviews/migrations/*
