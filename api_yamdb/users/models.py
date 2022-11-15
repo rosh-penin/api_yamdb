@@ -9,7 +9,7 @@ ROLES = (
 
 
 class User(AbstractUser):
-    email = models.EmailField('email address')
+    email = models.EmailField('email адрес', unique=True)
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -23,12 +23,10 @@ class User(AbstractUser):
     is_active = models.BooleanField(
         'active',
         default=False,
-        help_text=(
-            'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
-        ),
+        help_text='Является ли пользователь активным.'
     )
-    confirmation_code = models.TextField('Код подтверждения',
+    confirmation_code = models.CharField('Код подтверждения',
+                                         max_length=50,
                                          blank=True,
                                          null=True
                                          )
