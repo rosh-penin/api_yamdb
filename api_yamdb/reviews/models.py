@@ -25,6 +25,12 @@ class Title(models.Model):
         blank=True,
         null=True
     )
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenreTitle',
+        related_name='titles',
+        blank=True
+    )
 
 
 class GenreTitle(models.Model):
