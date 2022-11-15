@@ -53,7 +53,11 @@ class Review(BaseModel):
         related_name='posts',
         verbose_name='Автор отзыва'
     )
-    score = models.IntegerField('Оценка', max_length=2)
+    score = models.IntegerField(
+        'Оценка',
+        max_length=2,
+        help_text='Оценка произведения от 1 до 10'
+    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -69,6 +73,14 @@ class Review(BaseModel):
             models.UniqueConstraint(
                 fields=['title', 'author'],
                 name='double_review_constraint'
+            ),
+            models.CheckConstraint(
+                check=models.Q(score__gte=1),
+                name='score_gte_1'
+            ),
+            models.CheckConstraint(
+                check=models.Q(score__lte=10),
+                name='score_lte_10'
             ),
         ]
 
