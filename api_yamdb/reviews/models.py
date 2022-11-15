@@ -1,4 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -29,7 +32,6 @@ class GenreTitle(models.Model):
         Genre,
         on_delete=models.CASCADE,
         related_name='genretitle'
-    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -38,3 +40,75 @@ class GenreTitle(models.Model):
 
     class Meta:
         unique_together = ('genre', 'title')
+
+
+class BaseModel(models.Model):
+    pub_date = models.DateTimeField(
+        'Дата создания',
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ('-pub_date', '-pk')
+        abstract = True
+
+
+class Review(BaseModel):
+    text = models.TextField('Отзыв')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='rating',
+        verbose_name='Автор отзыва'
+    )
+    score = models.IntegerField(
+        'Оценка',
+        max_length=2,
+        help_text='Оценка произведения от 1 до 10'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='rating',
+        verbose_name='Произведение'
+    )
+
+    def __str__(self):
+        return self.text[:20]
+
+    class Meta(BaseModel.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='double_review_constraint'
+            ),
+            models.CheckConstraint(
+                check=models.Q(score__gte=1),
+                name='score_gte_1'
+            ),
+            models.CheckConstraint(
+                check=models.Q(score__lte=10),
+                name='score_lte_10'
+            ),
+        ]
+
+
+class Comment(BaseModel):
+    text = models.TextField('Комментарий')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор комментария'
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Комментируемый отзыв'
+    )
+
+    class Meta(BaseModel.Meta):
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
