@@ -32,6 +32,7 @@ class GenreTitle(models.Model):
         Genre,
         on_delete=models.CASCADE,
         related_name='genretitle'
+    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -111,4 +112,3 @@ class Comment(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-

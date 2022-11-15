@@ -1,7 +1,7 @@
 import csv
 import os
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from api_yamdb.settings import BASE_DIR
 from reviews.models import Category, Genre, Title, GenreTitle
