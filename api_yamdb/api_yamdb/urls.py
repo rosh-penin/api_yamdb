@@ -6,10 +6,12 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('users.urls', namespace='users')),
+    # Conflict here. Move your urls in api app.
     path(
         'redoc/',
         TemplateView.as_view(template_name='redoc.html'),
         name='redoc'
     ),
-    # path('', include('api.urls'), name='api')
+    # path('/api', include('api.urls'), name='api')
+    # And uncomment line above.
 ]
