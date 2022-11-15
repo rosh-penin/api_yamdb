@@ -50,7 +50,7 @@ class Review(BaseModel):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='posts',
+        related_name='rating',
         verbose_name='Автор отзыва'
     )
     score = models.IntegerField(
@@ -61,7 +61,7 @@ class Review(BaseModel):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='ratings',
+        related_name='rating',
         verbose_name='Произведение'
     )
 
