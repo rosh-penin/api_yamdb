@@ -1,4 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -29,3 +32,62 @@ class Title(models.Model):
         blank=True,
         null=True
     )
+
+
+class BaseModel(models.Model):
+    pub_date = models.DateTimeField(
+        'Дата создания',
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ('-pub_date', '-pk')
+        abstract = True
+
+
+class Review(BaseModel):
+    text = models.TextField('Отзыв')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='posts',
+        verbose_name='Автор отзыва'
+    )
+    score = models.IntegerField('Оценка', max_length=2)
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='ratings',
+        verbose_name='Произведение'
+    )
+
+    def __str__(self):
+        return self.text[:20]
+
+    class Meta(BaseModel.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='double_review_constraint'
+            ),
+        ]
+
+
+class Comment(BaseModel):
+    text = models.TextField('Комментарий')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор комментария'
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Комментируемый отзыв'
+    )
+
+    class Meta(BaseModel.Meta):
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
