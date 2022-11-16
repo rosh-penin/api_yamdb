@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import permissions
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import (UserSerializer,
@@ -50,22 +49,23 @@ class UsersSignUp(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-def custom_token_obtain(request):
-    serializer = CustomTokenObtainSerializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.data.get('username')
-        confirmation_code = serializer.data.get('confirmation_code')
-        user = get_object_or_404(User, username=username)
-        if user.confirmation_code == confirmation_code:
-            user.confirmation_code = None
-            user.save()
-            return Response(get_access_token(user),
-                            status=status.HTTP_200_OK)
-        return Response({'confirmation_code': 'is invalid'},
-                        status=status.HTTP_400_BAD_REQUEST)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class UsersToken(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        serializer = CustomTokenObtainSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.data.get('username')
+            confirmation_code = serializer.data.get('confirmation_code')
+            user = get_object_or_404(User, username=username)
+            if user.confirmation_code == confirmation_code:
+                user.confirmation_code = None
+                user.save()
+                return Response(get_access_token(user),
+                                status=status.HTTP_200_OK)
+            return Response({'confirmation_code': 'is invalid'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
