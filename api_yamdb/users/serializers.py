@@ -4,13 +4,9 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
-
-    class Meta:
-        fields = ('username', 'email')
-        model = User
 
     def validate_username(self, value):
         if value == 'me':
@@ -19,7 +15,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        users = self.Meta.model.objects.all()
+        users = User.objects.all()
         if users.filter(username=data['username'], email=data['email']):
             return data
         if users.filter(username=data['username']):
