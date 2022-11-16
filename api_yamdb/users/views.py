@@ -21,7 +21,7 @@ def get_access_token(user):
     refresh = RefreshToken.for_user(user)
 
     return {
-        'access': str(refresh.access_token)
+        'token': str(refresh.access_token)
     }
 
 
