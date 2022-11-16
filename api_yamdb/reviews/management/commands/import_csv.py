@@ -18,6 +18,26 @@ ALLOWED_FILENAMES = {
     'users': User,
     'genre_title': GenreTitle,
 }
+# SORT_ORDER = {
+#     'users.csv': 1,
+#     'category.csv': 2,
+#     'genre.csv': 3,
+#     'title.csv': 4,
+#     'genre_title.csv': 5,
+#     'review.csv': 6,
+#     'comments.csv': 7,
+# }
+
+
+def sort_list(some_list: list):
+    if 'users.csv' in some_list:
+        some_list.insert(0, some_list.pop(some_list.index('users.csv')))
+    if 'comments.csv' in some_list:
+        some_list.insert(6, some_list.pop(some_list.index('comments.csv')))
+    if 'titles.csv' in some_list:
+        some_list.insert(3, some_list.pop(some_list.index('titles.csv')))
+
+    return some_list
 
 
 class Command(BaseCommand):
@@ -34,14 +54,11 @@ class Command(BaseCommand):
     def _correct_files(self):
         """Only .csv files allowed to proceed."""
         files = os.listdir(DATA_FILES_DIR)
-        genretitle = None
         for file in os.listdir(DATA_FILES_DIR):
             if not file.endswith('.csv'):
                 files.remove(file)
-            if file == 'genre_title.csv':
-                genretitle = files.pop(files.index(file))
 
-        return files, genretitle
+        return sort_list(files)
 
     def _populate_table(self, file, model):
         path = os.path.join(DATA_FILES_DIR, file)
@@ -49,17 +66,12 @@ class Command(BaseCommand):
             for row in csv.DictReader(csv_file):
                 if 'category' in row:
                     row['category_id'] = row.pop('category')
+                if 'author' in row:
+                    row['author_id'] = row.pop('author')
                 model.objects.get_or_create(**row)
 
     def handle(self, *args, **options):
-        files, genretitle = self._correct_files()
-        for file in files:
+        for file in self._correct_files():
             name = file.split('.')[0]
             if name in ALLOWED_FILENAMES:
                 self._populate_table(file, ALLOWED_FILENAMES[name])
-
-        if genretitle is not None and all(
-            x in files for x in ('titles.csv', 'genre.csv')
-        ):
-            file = 'genre_title.csv'
-            self._populate_table(file, ALLOWED_FILENAMES[file.split('.')[0]])
