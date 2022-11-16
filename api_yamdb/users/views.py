@@ -71,6 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    lookup_field = 'username'
 
     #  Либо переделать через отдельный вьюсет, сериализатор и роутер
     @action(methods=['get', 'patch'], detail=False, permission_classes=(permissions.IsAuthenticated,), url_path='me', url_name='me')
