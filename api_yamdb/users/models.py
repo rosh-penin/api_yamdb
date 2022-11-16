@@ -19,12 +19,6 @@ class User(AbstractUser):
                             default='user',
                             max_length=9
                             )
-
-    is_active = models.BooleanField(
-        'active',
-        default=False,
-        help_text='Является ли пользователь активным.'
-    )
     confirmation_code = models.CharField('Код подтверждения',
                                          max_length=50,
                                          blank=True,
