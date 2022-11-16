@@ -8,7 +8,10 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import mixins
+from rest_framework.decorators import action
 
+from api.permissions import IsAdmin
 from .serializers import (UserSerializer,
                           SignUpSerializer,
                           CustomTokenObtainSerializer
@@ -19,10 +22,7 @@ User = get_user_model()
 
 def get_access_token(user):
     refresh = RefreshToken.for_user(user)
-
-    return {
-        'token': str(refresh.access_token)
-    }
+    return {'token': str(refresh.access_token)}
 
 
 def send_confirmation_code(to_email, confirmation_code):
@@ -68,5 +68,18 @@ class UsersTokenObtain(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    #  Либо переделать через отдельный вьюсет, сериализатор и роутер
+    @action(methods=['get', 'patch'], detail=False, permission_classes=(permissions.IsAuthenticated,), url_path='me', url_name='me')
+    def me(self, request):
+        # if request.method == 'PATCH':
+        #     # serializer = self.serializer_class(data=request.data)
+        #     serializer = SignUpSerializer(data=request.data)
+        #     serializer.is_valid(raise_exception=True)
+        #     request.user.save(**serializer.data)
+        #     return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
