@@ -151,4 +151,4 @@ media/
 # Local emails dir
 api_yamdb/sent_emails/
 
-/api_yamdb/reviews/migrations/*
+api_yamdb/reviews/migrations/*
