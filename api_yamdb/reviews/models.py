@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 User = get_user_model()
@@ -65,18 +66,21 @@ class Review(BaseModel):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='rating',
+        related_name='reviews',
         verbose_name='Автор отзыва'
     )
     score = models.IntegerField(
         'Оценка',
-        max_length=2,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ],
         help_text='Оценка произведения от 1 до 10'
     )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='rating',
+        related_name='reviews',
         verbose_name='Произведение'
     )
 
@@ -88,14 +92,6 @@ class Review(BaseModel):
             models.UniqueConstraint(
                 fields=['title', 'author'],
                 name='double_review_constraint'
-            ),
-            models.CheckConstraint(
-                check=models.Q(score__gte=1),
-                name='score_gte_1'
-            ),
-            models.CheckConstraint(
-                check=models.Q(score__lte=10),
-                name='score_lte_10'
             ),
         ]
 
