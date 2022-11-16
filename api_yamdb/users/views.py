@@ -8,14 +8,11 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import mixins
 from rest_framework.decorators import action
 
 from api.permissions import IsAdmin
-from .serializers import (UserSerializer,
-                          SignUpSerializer,
-                          CustomTokenObtainSerializer
-                          )
+from .serializers import (UserSerializer, SignUpSerializer,
+                          CustomTokenObtainSerializer)
 
 User = get_user_model()
 
@@ -73,14 +70,15 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     lookup_field = 'username'
 
-    #  Либо переделать через отдельный вьюсет, сериализатор и роутер
-    @action(methods=['get', 'patch'], detail=False, permission_classes=(permissions.IsAuthenticated,), url_path='me', url_name='me')
+    @action(methods=['get', 'patch'], detail=False,
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path='me', url_name='me')
     def me(self, request):
-        # if request.method == 'PATCH':
-        #     # serializer = self.serializer_class(data=request.data)
-        #     serializer = SignUpSerializer(data=request.data)
-        #     serializer.is_valid(raise_exception=True)
-        #     request.user.save(**serializer.data)
-        #     return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = self.get_serializer(request.user, data=request.data,
+                                             partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(role=request.user.role)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
