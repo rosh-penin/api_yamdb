@@ -30,7 +30,8 @@ class TitleSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         summ = 0
-        for query_obj in obj.rating.values('score'):
+        scores = obj.rating.values('score')
+        for query_obj in scores:
             summ += query_obj.get('score')
 
-        return summ // len(obj.rating.values('score'))
+        return summ // len(scores)
