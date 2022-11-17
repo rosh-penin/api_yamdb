@@ -18,15 +18,6 @@ ALLOWED_FILENAMES = {
     'users': User,
     'genre_title': GenreTitle,
 }
-# SORT_ORDER = {
-#     'users.csv': 1,
-#     'category.csv': 2,
-#     'genre.csv': 3,
-#     'title.csv': 4,
-#     'genre_title.csv': 5,
-#     'review.csv': 6,
-#     'comments.csv': 7,
-# }
 
 
 def sort_list(some_list: list):
