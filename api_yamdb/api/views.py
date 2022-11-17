@@ -1,9 +1,11 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.filters import SearchFilter
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin)
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from reviews.models import Category, Genre, Title, Review
+from .filters import TitleFilters
 from .permissions import IsAdminOrReadOnly, IsAdminOrModerOrAuthorOrReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleSerializer, ReviewSerializer,
@@ -14,6 +16,8 @@ class BaseViewSet(CreateModelMixin, DestroyModelMixin,
                   ListModelMixin, GenericViewSet):
     lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (SearchFilter, )
+    search_fields = ('name',)
 
 
 class CategoryViewSet(BaseViewSet):
@@ -29,8 +33,9 @@ class GenreViewSet(BaseViewSet):
 
 class TitleViewSet(ModelViewSet):
     serializer_class = TitleSerializer
-    queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
+    queryset = Title.objects.all()
+    filterset_class = TitleFilters
 
 
 class ReviewViewSet(ModelViewSet):
@@ -41,7 +46,7 @@ class ReviewViewSet(ModelViewSet):
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
-        return title.reviews
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
@@ -58,7 +63,7 @@ class CommentViewSet(ModelViewSet):
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, pk=review_id)
-        return review.comments
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')

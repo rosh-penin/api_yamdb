@@ -65,7 +65,11 @@ class TitleSerializer(serializers.ModelSerializer):
                   'description', 'genre', 'category')
 
     def get_rating(self, obj):
-        return obj.reviews.aggregate(Avg('score')).get('score__avg')
+        score = obj.reviews.aggregate(Avg('score')).get('score__avg')
+        if score is not None:
+            score = round(score, 1)
+
+        return score
 
     def validate_year(self, value):
         if value > datetime.now().year:

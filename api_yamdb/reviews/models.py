@@ -33,8 +33,13 @@ class Title(models.Model):
         blank=True
     )
 
-    class Meta:
-        unique_together = ('name', 'year', 'category')
+    class Meta():
+        constraints = [
+            models.UniqueConstraint(
+                fields=('name', 'year', 'category'),
+                name='triple title constraint'
+            ),
+        ]
 
 
 class GenreTitle(models.Model):
@@ -49,8 +54,13 @@ class GenreTitle(models.Model):
         related_name='genretitle'
     )
 
-    class Meta:
-        unique_together = ('genre', 'title')
+    class Meta():
+        constraints = [
+            models.UniqueConstraint(
+                fields=('genre', 'title'),
+                name='double genre constraint'
+            ),
+        ]
 
 
 class BaseModel(models.Model):
