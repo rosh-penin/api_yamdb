@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from django.utils.crypto import get_random_string
+from django.contrib.auth.tokens import default_token_generator
 from rest_framework import permissions
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -37,12 +38,10 @@ class UsersSignUp(APIView):
         serializer.is_valid(raise_exception=True)
         username = serializer.data.get('username')
         email = serializer.data.get('email')
-        confirmation_code = get_random_string(length=50)
         user, created = User.objects.get_or_create(username=username,
                                                    email=email)
+        confirmation_code = default_token_generator.make_token(user)
         send_confirmation_code([email], confirmation_code)
-        user.confirmation_code = confirmation_code
-        user.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -55,13 +54,10 @@ class UsersTokenObtain(APIView):
         username = serializer.data.get('username')
         confirmation_code = serializer.data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
-        if user.confirmation_code == confirmation_code:
-            user.confirmation_code = None
-            user.save()
+        if default_token_generator.check_token(user, confirmation_code):
             return Response(get_access_token(user),
                             status=status.HTTP_200_OK)
-        return Response({'confirmation_code': 'is invalid'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        raise serializers.ValidationError({'confirmation_code': 'is_invalid'})
 
 
 class UserViewSet(viewsets.ModelViewSet):
