@@ -152,5 +152,4 @@ media/
 api_yamdb/sent_emails/
 
 api_yamdb/reviews/migrations/*
-migrations/*
-*/migrations/*
+api_yamdb/users/migrations/*
