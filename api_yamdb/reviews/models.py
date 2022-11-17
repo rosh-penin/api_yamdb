@@ -33,6 +33,9 @@ class Title(models.Model):
         blank=True
     )
 
+    class Meta:
+        unique_together = ('name', 'year', 'category')
+
 
 class GenreTitle(models.Model):
     genre = models.ForeignKey(

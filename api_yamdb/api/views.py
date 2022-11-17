@@ -4,18 +4,16 @@ from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from reviews.models import Category, Genre, Title, Review
-from permissions import IsAdminOrModerOrAuthorOrReadOnly
-from .serializers import (
-    CategorySerializer,
-    GenreSerializer,
-    TitleSerializer,
-    ReviewSerializer,
-    CommentSerializer)
+from permissions import IsAdminOrReadOnly, IsAdminOrModerOrAuthorOrReadOnly
+from .serializers import (CategorySerializer, GenreSerializer,
+                          TitleSerializer, ReviewSerializer,
+                          CommentSerializer)
 
 
 class BaseViewSet(CreateModelMixin, DestroyModelMixin,
                   ListModelMixin, GenericViewSet):
     lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class CategoryViewSet(BaseViewSet):
@@ -32,12 +30,13 @@ class GenreViewSet(BaseViewSet):
 class TitleViewSet(ModelViewSet):
     serializer_class = TitleSerializer
     queryset = Title.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     queryset = Review.objects.all()
-    permission_classes = [IsAdminOrModerOrAuthorOrReadOnly, ]
+    permission_classes = (IsAdminOrModerOrAuthorOrReadOnly, )
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -54,7 +53,7 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAdminOrModerOrAuthorOrReadOnly, ]
+    permission_classes = (IsAdminOrModerOrAuthorOrReadOnly, )
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
