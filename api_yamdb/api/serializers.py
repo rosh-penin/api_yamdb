@@ -65,16 +65,13 @@ class TitleSerializer(serializers.ModelSerializer):
                   'description', 'genre', 'category')
 
     def get_rating(self, obj):
-        try:
-            score = int(obj.rating.aggregate(Avg('score')).get('score__avg'))
-        except TypeError:
-            score = 0
-
-        return score
+        return obj.reviews.aggregate(Avg('score')).get('score__avg')
 
     def validate_year(self, value):
         if value > datetime.now().year:
             raise serializers.ValidationError('Back to the future. Error')
+
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
