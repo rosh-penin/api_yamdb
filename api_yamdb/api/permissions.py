@@ -3,15 +3,15 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return (request.user.role == 'admin' or request.user.is_superuser
-                if request.user.is_authenticated else False)
+        return request.user.is_authenticated and (request.user.role == 'admin'
+                                                  or request.user.is_superuser)
 
 
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return (request.method in SAFE_METHODS
-                or (request.user.role == 'admin' or request.user.is_superuser)
-                if request.user.is_authenticated else False)
+                or (request.user.is_authenticated and request.user.role
+                    == 'admin' or request.user.is_superuser))
 
 
 class IsAdminOrModerOrAuthorOrReadOnly(BasePermission):
