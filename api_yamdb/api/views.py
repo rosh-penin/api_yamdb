@@ -4,7 +4,7 @@ from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from reviews.models import Category, Genre, Title, Review
-from permissions import IsAdminOrReadOnly, IsAdminOrModerOrAuthorOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsAdminOrModerOrAuthorOrReadOnly
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleSerializer, ReviewSerializer,
                           CommentSerializer)
