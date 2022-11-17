@@ -1,15 +1,16 @@
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin)
-from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from reviews.models import Category, Genre, Title
+from .permissions import IsAdminOrReadOnly
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
 
 
 class BaseViewSet(CreateModelMixin, DestroyModelMixin,
                   ListModelMixin, GenericViewSet):
     lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class CategoryViewSet(BaseViewSet):
@@ -26,4 +27,4 @@ class GenreViewSet(BaseViewSet):
 class TitleViewSet(ModelViewSet):
     serializer_class = TitleSerializer
     queryset = Title.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAdminOrReadOnly,)
