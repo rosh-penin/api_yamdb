@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
 
 User = get_user_model()
+username_validator = UnicodeUsernameValidator()
 
 
 class SignUpSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
+    username = serializers.CharField(max_length=150,
+                                     validators=[username_validator])
     email = serializers.EmailField()
 
     def validate_username(self, value):
