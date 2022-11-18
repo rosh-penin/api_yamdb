@@ -54,11 +54,11 @@ class ReviewViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object(self, 'title_id', Title)
+        if self.request.user.reviews.filter(title=title):
+            raise ValidationError('You already posted review to this title')
         serializer.save(
             author=self.request.user,
             title=title)
-        if self.request.user.reviews.filter(title=title):
-            raise ValidationError('You already posted review to this title')
 
 
 class CommentViewSet(ModelViewSet):
