@@ -9,6 +9,7 @@ ROLES = (
 
 
 class User(AbstractUser):
+    """Custom user model with required email field, new bio and role fields."""
     email = models.EmailField('email адрес', unique=True, max_length=254)
     bio = models.TextField(
         'Биография',

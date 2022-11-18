@@ -19,11 +19,16 @@ User = get_user_model()
 
 
 def get_access_token(user):
+    """Get user object and return the access token."""
     refresh = RefreshToken.for_user(user)
     return {'token': str(refresh.access_token)}
 
 
 class UsersSignUp(APIView):
+    """Allows users to get confirmation code to their email.
+    If user with specified username and email doesn't exist,
+    the new account will be created.
+    """
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -45,6 +50,9 @@ class UsersSignUp(APIView):
 
 
 class UsersTokenObtain(APIView):
+    """User can send his username
+    and confirmation code and receive authentication token.
+    """
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -60,6 +68,9 @@ class UsersTokenObtain(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Admin or superuser can manage users. The 'me' action allows users
+    to get the information about himself or modify this information.
+    """
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
