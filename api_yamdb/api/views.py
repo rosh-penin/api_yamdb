@@ -19,6 +19,7 @@ def get_object(self, keyword, model):
 
 class BaseViewSet(CreateModelMixin, DestroyModelMixin,
                   ListModelMixin, GenericViewSet):
+    '''ViewSet for inheriting. Pre-configured some stuff.'''
     lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (SearchFilter, )
@@ -26,17 +27,20 @@ class BaseViewSet(CreateModelMixin, DestroyModelMixin,
 
 
 class CategoryViewSet(BaseViewSet):
+    '''ViewSet for Category model.'''
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
     lookup_field = 'slug'
 
 
 class GenreViewSet(BaseViewSet):
+    '''ViewSet for Genre model.'''
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
 
 
 class TitleViewSet(ModelViewSet):
+    '''ViewSet for Title model.'''
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Title.objects.all()

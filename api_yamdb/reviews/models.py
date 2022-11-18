@@ -6,16 +6,19 @@ User = get_user_model()
 
 
 class Category(models.Model):
+    '''Model for categories.'''
     name = models.CharField('Название категории', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
 
 
 class Genre(models.Model):
+    '''Model for genres.'''
     name = models.CharField('Название жанра', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
 
 
 class Title(models.Model):
+    '''Model for titles.'''
     name = models.CharField('Название', max_length=200)
     year = models.IntegerField('Год выпуска')
     description = models.TextField('Описание', blank=True, null=True)
@@ -43,6 +46,10 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
+    '''
+    Intermediate model for connecting Title and
+    Genre ManyToMany relation.
+    '''
     genre = models.ForeignKey(
         Genre,
         on_delete=models.CASCADE,
@@ -100,13 +107,13 @@ class Review(BaseModel):
     def __str__(self):
         return self.text[:20]
 
-    # class Meta(BaseModel.Meta):
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['title', 'author'],
-    #             name='double_review_constraint'
-    #         ),
-    #     ]
+    class Meta(BaseModel.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='double_review_constraint'
+            ),
+        ]
 
 
 class Comment(BaseModel):
