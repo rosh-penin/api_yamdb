@@ -9,7 +9,8 @@ ROLES = (
 
 
 class User(AbstractUser):
-    email = models.EmailField('email адрес', unique=True)
+    """Custom user model with required email field, new bio and role fields."""
+    email = models.EmailField('email адрес', unique=True, max_length=254)
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -19,14 +20,3 @@ class User(AbstractUser):
                             default='user',
                             max_length=9
                             )
-
-    is_active = models.BooleanField(
-        'active',
-        default=False,
-        help_text='Является ли пользователь активным.'
-    )
-    confirmation_code = models.CharField('Код подтверждения',
-                                         max_length=50,
-                                         blank=True,
-                                         null=True
-                                         )
