@@ -115,6 +115,6 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 # Settings for token system
 SIMPLE_JWT = {
-   'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-   'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
