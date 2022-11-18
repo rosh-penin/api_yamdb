@@ -58,7 +58,7 @@ python3 manage.py runserver
 
 Команда для заполнения таблиц контентом из .csv файлов:
 
-```sh
+```
 python manage.py import_csv
 ```
 

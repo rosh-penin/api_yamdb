@@ -3,7 +3,7 @@ from reviews.models import Category, Genre, Title
 
 
 class TitleFilters(FilterSet):
-    '''Filtering for TitleViewSet. Nested slug field filter implemented.'''
+    """Filtering for TitleViewSet. Nested slug field filter implemented."""
     genre = ModelMultipleChoiceFilter(
         field_name='genre__slug',
         to_field_name='slug',

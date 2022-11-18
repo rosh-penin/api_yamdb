@@ -19,7 +19,7 @@ def get_object(self, keyword, model):
 
 class BaseViewSet(CreateModelMixin, DestroyModelMixin,
                   ListModelMixin, GenericViewSet):
-    '''ViewSet for inheriting. Pre-configured some stuff.'''
+    """ViewSet for inheriting. Pre-configured some stuff."""
     lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (SearchFilter, )
@@ -27,20 +27,20 @@ class BaseViewSet(CreateModelMixin, DestroyModelMixin,
 
 
 class CategoryViewSet(BaseViewSet):
-    '''ViewSet for Category model.'''
+    """ViewSet for Category model."""
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
     lookup_field = 'slug'
 
 
 class GenreViewSet(BaseViewSet):
-    '''ViewSet for Genre model.'''
+    """ViewSet for Genre model."""
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
 
 
 class TitleViewSet(ModelViewSet):
-    '''ViewSet for Title model.'''
+    """ViewSet for Title model."""
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Title.objects.all()
@@ -48,7 +48,7 @@ class TitleViewSet(ModelViewSet):
 
 
 class ReviewViewSet(ModelViewSet):
-    '''ViewSet for Review model.'''
+    """ViewSet for Review model."""
     serializer_class = ReviewSerializer
     queryset = Review.objects.all()
     permission_classes = (IsAdminOrModerOrAuthorOrReadOnly, )
@@ -67,7 +67,7 @@ class ReviewViewSet(ModelViewSet):
 
 
 class CommentViewSet(ModelViewSet):
-    '''ViewSet for Comment model.'''
+    """ViewSet for Comment model."""
     serializer_class = CommentSerializer
     permission_classes = (IsAdminOrModerOrAuthorOrReadOnly, )
 

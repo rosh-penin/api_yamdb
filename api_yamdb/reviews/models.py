@@ -6,19 +6,19 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    '''Model for categories.'''
+    """Model for categories."""
     name = models.CharField('Название категории', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
 
 
 class Genre(models.Model):
-    '''Model for genres.'''
+    """Model for genres."""
     name = models.CharField('Название жанра', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
 
 
 class Title(models.Model):
-    '''Model for titles.'''
+    """Model for titles."""
     name = models.CharField('Название', max_length=200)
     year = models.IntegerField('Год выпуска')
     description = models.TextField('Описание', blank=True, null=True)
@@ -46,10 +46,10 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    '''
+    """
     Intermediate model for connecting Title and
     Genre ManyToMany relation.
-    '''
+    """
     genre = models.ForeignKey(
         Genre,
         on_delete=models.CASCADE,
@@ -71,6 +71,7 @@ class GenreTitle(models.Model):
 
 
 class BaseModel(models.Model):
+    """Model for inheriting with pre-set fields and Meta."""
     pub_date = models.DateTimeField(
         'Дата создания',
         auto_now_add=True
@@ -82,6 +83,7 @@ class BaseModel(models.Model):
 
 
 class Review(BaseModel):
+    """Model for reviews."""
     text = models.TextField('Отзыв')
     author = models.ForeignKey(
         User,
@@ -117,6 +119,7 @@ class Review(BaseModel):
 
 
 class Comment(BaseModel):
+    """Model for comments."""
     text = models.TextField('Комментарий')
     author = models.ForeignKey(
         User,

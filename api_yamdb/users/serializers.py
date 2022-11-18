@@ -7,6 +7,9 @@ username_validator = UnicodeUsernameValidator()
 
 
 class SignUpSerializer(serializers.Serializer):
+    """Check if combination of username and email exists or
+    doesn't exist than return the data.
+    """
     username = serializers.CharField(max_length=150,
                                      validators=[username_validator])
     email = serializers.EmailField()
@@ -29,11 +32,13 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class CustomTokenObtainSerializer(serializers.Serializer):
+    """Token obtain serializer."""
     username = serializers.CharField(max_length=150)
     confirmation_code = serializers.CharField(max_length=150)
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """User serializer to serialize the user model."""
     class Meta:
         fields = ('username', 'email', 'first_name', 'last_name', 'bio',
                   'role')

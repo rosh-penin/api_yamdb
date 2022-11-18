@@ -21,10 +21,10 @@ ALLOWED_FILENAMES = {
 
 
 def sort_list(some_list: list):
-    '''
+    """
     Custom ordering for files.
     Should be done since some files depends on another.
-    '''
+    """
     if 'users.csv' in some_list:
         some_list.insert(0, some_list.pop(some_list.index('users.csv')))
     if 'comments.csv' in some_list:
@@ -36,7 +36,7 @@ def sort_list(some_list: list):
 
 
 class Command(BaseCommand):
-    '''Command class. See help attribute for further info.'''
+    """Command class. See help attribute for further info."""
     help = '''Take all .csv files inside "static/data" folder of
         root django project and populate tables. Filenames should be:
         category.csv
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         genre_title.csv'''
 
     def _correct_files(self):
-        '''Only .csv files allowed to proceed.'''
+        """Only .csv files allowed to proceed."""
         files = os.listdir(DATA_FILES_DIR)
         for file in os.listdir(DATA_FILES_DIR):
             if not file.endswith('.csv'):
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         return sort_list(files)
 
     def _populate_table(self, file, model):
-        '''Create table entries row by row.'''
+        """Create table entries row by row."""
         path = os.path.join(DATA_FILES_DIR, file)
         with open(path, 'r', encoding='utf8') as csv_file:
             for row in csv.DictReader(csv_file):
