@@ -19,18 +19,16 @@ User = get_user_model()
 
 
 def get_access_token(user):
+    """Get user object and return the access token."""
     refresh = RefreshToken.for_user(user)
     return {'token': str(refresh.access_token)}
 
 
-def send_confirmation_code(to_email, confirmation_code):
-    subject = 'Ваш код для получения токена.'
-    body = f'Код для получения токена: {confirmation_code}'
-    from_email = 'no-reply@example.com'
-    send_mail(subject, body, from_email, to_email, fail_silently=False)
-
-
 class UsersSignUp(APIView):
+    """Allows users to get confirmation code to their email.
+    If user with specified username and email doesn't exist,
+    the new account will be created.
+    """
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -41,11 +39,20 @@ class UsersSignUp(APIView):
         user, created = User.objects.get_or_create(username=username,
                                                    email=email)
         confirmation_code = default_token_generator.make_token(user)
-        send_confirmation_code([email], confirmation_code)
+        send_mail(
+            'Ваш код для получения токена.',
+            f'Здравствуйте, {username}! Ваш код для получения токена на сайте:'
+            f' {confirmation_code}',
+            'no-reply@example.com',
+            [email], fail_silently=False
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UsersTokenObtain(APIView):
+    """User can send his username
+    and confirmation code and receive authentication token.
+    """
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -57,18 +64,20 @@ class UsersTokenObtain(APIView):
         if default_token_generator.check_token(user, confirmation_code):
             return Response(get_access_token(user),
                             status=status.HTTP_200_OK)
-        raise serializers.ValidationError({'confirmation_code': 'is_invalid'})
+        raise serializers.ValidationError({'confirmation_code': 'is invalid'})
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Admin or superuser can manage users. The 'me' action allows users
+    to get the information about himself or modify this information.
+    """
     permission_classes = (IsAdmin,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
 
     @action(methods=['get', 'patch'], detail=False,
-            permission_classes=(permissions.IsAuthenticated,),
-            url_path='me', url_name='me')
+            permission_classes=(permissions.IsAuthenticated,))
     def me(self, request):
         if request.method == 'PATCH':
             serializer = self.get_serializer(request.user, data=request.data,
