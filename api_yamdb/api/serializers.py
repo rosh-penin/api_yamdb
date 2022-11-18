@@ -7,6 +7,7 @@ from reviews.models import Category, Genre, Title, Review, Comment
 
 
 class CustomSlugField(serializers.RelatedField):
+    '''Custom field for inheriting.'''
 
     def to_representation(self, value):
         return {
@@ -26,6 +27,7 @@ class CustomSlugField(serializers.RelatedField):
 
 
 class CategorySlugField(CustomSlugField):
+    '''Custom field for category field correct work.'''
     queryset = Category.objects.all()
 
     class Meta:
@@ -33,6 +35,7 @@ class CategorySlugField(CustomSlugField):
 
 
 class GenreSlugField(CustomSlugField):
+    '''Custom field for genre field correct work.'''
     queryset = Genre.objects.all()
 
     class Meta:
@@ -40,20 +43,21 @@ class GenreSlugField(CustomSlugField):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
+    '''Serializer for Category model.'''
     class Meta:
         model = Category
         fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
+    '''Serializer for Genre model.'''
     class Meta:
         model = Genre
         fields = ('name', 'slug')
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    '''Serializer for Title model.'''
     category = CategorySlugField()
     genre = GenreSlugField(many=True)
     rating = serializers.SerializerMethodField(read_only=True)
@@ -65,6 +69,7 @@ class TitleSerializer(serializers.ModelSerializer):
                   'description', 'genre', 'category')
 
     def get_rating(self, obj):
+        '''Score field is calculated to show average score.'''
         score = obj.reviews.aggregate(Avg('score')).get('score__avg')
         if score is not None:
             score = round(score, 1)
@@ -72,6 +77,7 @@ class TitleSerializer(serializers.ModelSerializer):
         return score
 
     def validate_year(self, value):
+        '''Year should not be higher than current year.'''
         if value > datetime.now().year:
             raise serializers.ValidationError('Back to the future. Error')
 
