@@ -23,13 +23,6 @@ def get_access_token(user):
     return {'token': str(refresh.access_token)}
 
 
-def send_confirmation_code(to_email, confirmation_code):
-    subject = 'Ваш код для получения токена.'
-    body = f'Код для получения токена: {confirmation_code}'
-    from_email = 'no-reply@example.com'
-    send_mail(subject, body, from_email, to_email, fail_silently=False)
-
-
 class UsersSignUp(APIView):
     permission_classes = (permissions.AllowAny,)
 
@@ -41,7 +34,13 @@ class UsersSignUp(APIView):
         user, created = User.objects.get_or_create(username=username,
                                                    email=email)
         confirmation_code = default_token_generator.make_token(user)
-        send_confirmation_code([email], confirmation_code)
+        send_mail(
+            'Ваш код для получения токена.',
+            f'Здравствуйте, {username}! Ваш код для получения токена на сайте:'
+            f' {confirmation_code}',
+            'no-reply@example.com',
+            [email], fail_silently=False
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -57,7 +56,7 @@ class UsersTokenObtain(APIView):
         if default_token_generator.check_token(user, confirmation_code):
             return Response(get_access_token(user),
                             status=status.HTTP_200_OK)
-        raise serializers.ValidationError({'confirmation_code': 'is_invalid'})
+        raise serializers.ValidationError({'confirmation_code': 'is invalid'})
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -67,8 +66,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
 
     @action(methods=['get', 'patch'], detail=False,
-            permission_classes=(permissions.IsAuthenticated,),
-            url_path='me', url_name='me')
+            permission_classes=(permissions.IsAuthenticated,))
     def me(self, request):
         if request.method == 'PATCH':
             serializer = self.get_serializer(request.user, data=request.data,
