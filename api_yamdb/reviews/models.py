@@ -100,13 +100,13 @@ class Review(BaseModel):
     def __str__(self):
         return self.text[:20]
 
-    class Meta(BaseModel.Meta):
-        constraints = [
-            models.UniqueConstraint(
-                fields=['title', 'author'],
-                name='double_review_constraint'
-            ),
-        ]
+    # class Meta(BaseModel.Meta):
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=['title', 'author'],
+    #             name='double_review_constraint'
+    #         ),
+    #     ]
 
 
 class Comment(BaseModel):
