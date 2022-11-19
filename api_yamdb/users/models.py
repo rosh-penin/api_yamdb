@@ -18,5 +18,16 @@ class User(AbstractUser):
     role = models.CharField('Роль',
                             choices=ROLES,
                             default='user',
-                            max_length=9
-                            )
+                            max_length=9)
+
+    @property
+    def is_admin(self):
+        if self.role == 'admin' or self.is_superuser:
+            return True
+        return False
+
+    @property
+    def is_moderator(self):
+        if self.role == 'moderator':
+            return True
+        return False
