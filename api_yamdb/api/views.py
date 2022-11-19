@@ -4,24 +4,38 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework import permissions
 from rest_framework import serializers
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-                                   ListModelMixin)
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin
+)
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import action
-from rest_framework.response import Response
+
 from reviews.models import Category, Genre, Title, Review
-from .filters import TitleFilters
-from .permissions import (IsAdminOrReadOnly, IsAdminOrModerOrAuthorOrReadOnly,
-                          IsAdmin)
-from .serializers import (CategorySerializer, GenreSerializer,
-                          TitleSerializer, ReviewSerializer, CommentSerializer,
-                          UserSerializer, SignUpSerializer,
-                          CustomTokenObtainSerializer)
 from users.models import User
+from .filters import TitleFilters
+from .permissions import (
+    IsAdminOrReadOnly,
+    IsAdminOrModerOrAuthorOrReadOnly,
+    IsAdmin
+)
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    TitleSerializerPostUpdate,
+    ReviewSerializer,
+    CommentSerializer,
+    UserSerializer,
+    SignUpSerializer,
+    CustomTokenObtainSerializer
+)
 
 EMAIL_FROM = 'no-reply@example.com'
 
@@ -60,10 +74,15 @@ class GenreViewSet(BaseViewSet):
 
 class TitleViewSet(ModelViewSet):
     """ViewSet for Title model."""
-    serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Title.objects.all()
     filterset_class = TitleFilters
+
+    def get_serializer_class(self):
+        if self.action not in ('list', 'retrieve'):
+            return TitleSerializerPostUpdate
+
+        return TitleSerializer
 
 
 class ReviewViewSet(ModelViewSet):
@@ -118,11 +137,12 @@ class UsersSignUp(APIView):
                                                    email=email)
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
-            'Ваш код для получения токена.',
+            'Ваш код для получения токена. ',
             f'Здравствуйте, {username}! Ваш код для получения токена: '
             f'{confirmation_code}',
             EMAIL_FROM,
-            [email], fail_silently=False
+            [email],
+            fail_silently=False
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 

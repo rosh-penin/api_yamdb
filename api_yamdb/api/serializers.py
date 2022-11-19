@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db.models import Avg
 from rest_framework import serializers
@@ -8,42 +6,6 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from users.models import User
 
 username_validator = UnicodeUsernameValidator()
-
-
-class CustomSlugField(serializers.RelatedField):
-    """Custom field for inheriting."""
-
-    def to_representation(self, value):
-        return {
-            'name': value.name,
-            'slug': value.slug
-        }
-
-    def to_internal_value(self, data):
-        Obj = self.Meta.model
-        assert isinstance(data, str), 'Value must be string'
-        try:
-            return Obj.objects.get(slug=data)
-        except Obj.DoesNotExist:
-            raise serializers.ValidationError(
-                'Object with this slug value does not exist.'
-            )
-
-
-class CategorySlugField(CustomSlugField):
-    """Custom field for category field correct work."""
-    queryset = Category.objects.all()
-
-    class Meta:
-        model = Category
-
-
-class GenreSlugField(CustomSlugField):
-    """Custom field for genre field correct work."""
-    queryset = Genre.objects.all()
-
-    class Meta:
-        model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -61,11 +23,11 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    """Serializer for Title model."""
-    category = CategorySlugField()
-    genre = GenreSlugField(many=True)
-    rating = serializers.SerializerMethodField(read_only=True)
+    """Serializer for Title model. Only for GET requests."""
+    category = CategorySerializer()
+    genre = GenreSerializer(many=True)
     description = serializers.CharField(required=False)
+    rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Title
@@ -80,12 +42,18 @@ class TitleSerializer(serializers.ModelSerializer):
 
         return score
 
-    def validate_year(self, value):
-        """Year should not be higher than current year."""
-        if value > datetime.now().year:
-            raise serializers.ValidationError('Back to the future. Error')
 
-        return value
+class TitleSerializerPostUpdate(TitleSerializer):
+    """Serializer for Title model. POST, PATCH and DELETE requests."""
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+        many=True
+    )
 
 
 class ReviewSerializer(serializers.ModelSerializer):

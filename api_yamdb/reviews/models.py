@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -5,10 +7,21 @@ from django.db import models
 User = get_user_model()
 
 
+def NotOverCurrentYearValidator(value):
+    current_year = datetime.now().year
+    return MaxValueValidator(current_year)(value)
+
+
 class Category(models.Model):
     """Model for categories."""
     name = models.CharField('Название категории', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
+
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Genre(models.Model):
@@ -16,11 +29,22 @@ class Genre(models.Model):
     name = models.CharField('Название жанра', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
 
+    class Meta:
+        ordering = ('name',)
+
+    def __str__(self):
+        return self.name
+
 
 class Title(models.Model):
     """Model for titles."""
     name = models.CharField('Название', max_length=200)
-    year = models.IntegerField('Год выпуска')
+    year = models.IntegerField(
+        'Год выпуска',
+        validators=[
+            NotOverCurrentYearValidator
+        ]
+    )
     description = models.TextField('Описание', blank=True, null=True)
     category = models.ForeignKey(
         Category,
@@ -37,12 +61,16 @@ class Title(models.Model):
     )
 
     class Meta():
+        ordering = ('name',)
         constraints = [
             models.UniqueConstraint(
                 fields=('name', 'year', 'category'),
                 name='triple title constraint'
             ),
         ]
+
+    def __str__(self):
+        return self.name
 
 
 class GenreTitle(models.Model):
@@ -68,6 +96,9 @@ class GenreTitle(models.Model):
                 name='double genre constraint'
             ),
         ]
+
+    def __str__(self):
+        return f'genre "{self.genre}" for title "{self.title}"'
 
 
 class BaseModel(models.Model):
