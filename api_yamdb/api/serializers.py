@@ -1,9 +1,11 @@
 from datetime import datetime
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
 from rest_framework import serializers, validators
 
 from reviews.models import Category, Genre, Title, Review, Comment
+from api_yamdb.settings import MAX_SCORE_VALUE, MIN_SCORE_VALUE
 
 
 class CustomSlugField(serializers.RelatedField):
@@ -114,7 +116,18 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username',
         read_only=True,
         default=serializers.CurrentUserDefault())
-    score = serializers.IntegerField(min_value=1, max_value=10)
+    score = serializers.IntegerField(
+        validators=[
+            MinValueValidator(
+                limit_value=MIN_SCORE_VALUE,
+                message='You can`t rate less then 1!'
+            ),
+            MaxValueValidator(
+                limit_value=MAX_SCORE_VALUE,
+                message='You can`t rate more then 10!'
+            )
+        ],
+    )
     title = serializers.HiddenField(
         default=ValueFromViewKeyword('title_id')
     )

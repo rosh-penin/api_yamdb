@@ -2,8 +2,13 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from api_yamdb.settings import (
+    MAX_SCORE_VALUE,
+    MIN_SCORE_VALUE,
+    STR_FUNC_SYMBOL_COUNT
+)
+
 User = get_user_model()
-STR_SYMBOL_COUNT = 20
 
 
 class Category(models.Model):
@@ -95,8 +100,8 @@ class Review(BaseModel):
     score = models.IntegerField(
         'Оценка',
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(MIN_SCORE_VALUE),
+            MaxValueValidator(MAX_SCORE_VALUE)
         ],
         help_text='Оценка произведения от 1 до 10'
     )
@@ -116,7 +121,7 @@ class Review(BaseModel):
         ]
 
     def __str__(self):
-        return self.text[:STR_SYMBOL_COUNT]
+        return self.text[:STR_FUNC_SYMBOL_COUNT]
 
 
 class Comment(BaseModel):
