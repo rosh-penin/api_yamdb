@@ -133,7 +133,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         validators = [
             validators.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
-                fields=['author', 'title']
+                fields=['author', 'title'],
+                message='You can`t rate twice!'
             )
         ]
 
