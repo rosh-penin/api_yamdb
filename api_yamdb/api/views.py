@@ -1,16 +1,22 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-                                   ListModelMixin)
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin
+)
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from reviews.models import Category, Genre, Title, Review
 from .filters import TitleFilters
 from .permissions import IsAdminOrReadOnly, IsAdminOrModerOrAuthorOrReadOnly
-from .serializers import (CategorySerializer, GenreSerializer,
-                          TitleSerializer, ReviewSerializer,
-                          CommentSerializer)
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    ReviewSerializer,
+    CommentSerializer
+)
 
 
 def get_object(self, keyword, model):
@@ -59,8 +65,6 @@ class ReviewViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object(self, 'title_id', Title)
-        if self.request.user.reviews.filter(title=title):
-            raise ValidationError('You already posted review to this title')
         serializer.save(
             author=self.request.user,
             title=title)

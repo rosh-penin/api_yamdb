@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 User = get_user_model()
+STR_SYMBOL_COUNT = 20
 
 
 class Category(models.Model):
@@ -36,7 +37,7 @@ class Title(models.Model):
         blank=True
     )
 
-    class Meta():
+    class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=('name', 'year', 'category'),
@@ -61,7 +62,7 @@ class GenreTitle(models.Model):
         related_name='genretitle'
     )
 
-    class Meta():
+    class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=('genre', 'title'),
@@ -106,9 +107,6 @@ class Review(BaseModel):
         verbose_name='Произведение'
     )
 
-    def __str__(self):
-        return self.text[:20]
-
     class Meta(BaseModel.Meta):
         constraints = [
             models.UniqueConstraint(
@@ -116,6 +114,9 @@ class Review(BaseModel):
                 name='double_review_constraint'
             ),
         ]
+
+    def __str__(self):
+        return self.text[:STR_SYMBOL_COUNT]
 
 
 class Comment(BaseModel):

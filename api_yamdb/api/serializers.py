@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db.models import Avg
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from reviews.models import Category, Genre, Title, Review, Comment
 
@@ -65,8 +65,15 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
+        )
 
     def get_rating(self, obj):
         """Score field is calculated to show average score."""
@@ -84,6 +91,23 @@ class TitleSerializer(serializers.ModelSerializer):
         return value
 
 
+class ValueFromViewKeyword:
+    """
+    Custom class to get default value by the key in serializer`s 'view'
+    context dictionary.
+    """
+    requires_context = True
+
+    def __init__(self, context_key):
+        self.key = context_key
+
+    def __call__(self, serializer_field):
+        return serializer_field.context.get('view').kwargs.get(self.key)
+
+    def __repr__(self):
+        return '%s()' % self.__class__.__name__
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     """Serializer for Review model."""
     author = serializers.SlugRelatedField(
@@ -91,6 +115,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault())
     score = serializers.IntegerField(min_value=1, max_value=10)
+    title = serializers.HiddenField(
+        default=ValueFromViewKeyword('title_id')
+    )
 
     class Meta:
         model = Review
@@ -100,8 +127,15 @@ class ReviewSerializer(serializers.ModelSerializer):
             'author',
             'score',
             'pub_date',
+            'title',
         )
         read_only_fields = ('pub_date',)
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=['author', 'title']
+            )
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
