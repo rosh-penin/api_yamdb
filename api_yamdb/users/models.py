@@ -1,11 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-ROLES = (
-    ('user', 'пользователь'),
-    ('moderator', 'модератор'),
-    ('admin', 'администратор'),
-)
+from .constants import ROLES
 
 
 class User(AbstractUser):
@@ -15,10 +11,12 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
-    role = models.CharField('Роль',
-                            choices=ROLES,
-                            default='user',
-                            max_length=9)
+    role = models.CharField(
+        'Роль',
+        choices=ROLES,
+        default='user',
+        max_length=9
+    )
 
     @property
     def is_admin(self):
