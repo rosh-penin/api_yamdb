@@ -2,8 +2,8 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MinValueValidator, MaxValueValidator
 from rest_framework import serializers, validators
 
+from reviews.constants import MAX_SCORE_VALUE, MIN_SCORE_VALUE
 from reviews.models import Category, Genre, Title, Review, Comment
-from api_yamdb.settings import MAX_SCORE_VALUE, MIN_SCORE_VALUE
 from users.models import User
 
 username_validator = UnicodeUsernameValidator()
@@ -78,7 +78,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
-        default=serializers.CurrentUserDefault())
+        default=serializers.CurrentUserDefault()
+    )
     score = serializers.IntegerField(
         validators=[
             MinValueValidator(
@@ -127,7 +128,8 @@ class CommentSerializer(serializers.ModelSerializer):
             'id',
             'text',
             'author',
-            'pub_date',)
+            'pub_date',
+        )
         read_only_fields = ('pub_date',)
 
 
@@ -135,14 +137,17 @@ class SignUpSerializer(serializers.Serializer):
     """Check if combination of username and email exists or
     doesn't exist than return the data.
     """
-    username = serializers.CharField(max_length=150,
-                                     validators=[username_validator])
+    username = serializers.CharField(
+        max_length=150,
+        validators=[username_validator]
+    )
     email = serializers.EmailField()
 
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
-                'Please, use another username to signup')
+                'Please, use another username to signup'
+            )
         return value
 
     def validate(self, data):
@@ -165,6 +170,12 @@ class CustomTokenObtainSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     """User serializer to serialize the user model."""
     class Meta:
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio',
-                  'role')
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
         model = User

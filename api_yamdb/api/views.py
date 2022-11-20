@@ -19,6 +19,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import Category, Genre, Title, Review
 from users.models import User
+from .constants import EMAIL_FROM
 from .filters import TitleFilters
 from .permissions import (
     IsAdminOrReadOnly,
@@ -37,8 +38,6 @@ from .serializers import (
     CustomTokenObtainSerializer
 )
 
-EMAIL_FROM = 'no-reply@example.com'
-
 
 def get_access_token(user):
     """Get user object and return the access token."""
@@ -50,8 +49,12 @@ def get_object(self, keyword, model):
     return get_object_or_404(model, pk=self.kwargs.get(keyword))
 
 
-class BaseViewSet(CreateModelMixin, DestroyModelMixin,
-                  ListModelMixin, GenericViewSet):
+class BaseViewSet(
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    GenericViewSet
+):
     """ViewSet for inheriting. Pre-configured some stuff."""
     lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
@@ -101,7 +104,8 @@ class ReviewViewSet(ModelViewSet):
         title = get_object(self, 'title_id', Title)
         serializer.save(
             author=self.request.user,
-            title=title)
+            title=title
+        )
 
 
 class CommentViewSet(ModelViewSet):
@@ -118,7 +122,8 @@ class CommentViewSet(ModelViewSet):
         review = get_object(self, 'review_id', Review)
         serializer.save(
             author=self.request.user,
-            review=review)
+            review=review
+        )
 
 
 class UsersSignUp(APIView):
@@ -133,8 +138,10 @@ class UsersSignUp(APIView):
         serializer.is_valid(raise_exception=True)
         username = serializer.data.get('username')
         email = serializer.data.get('email')
-        user, created = User.objects.get_or_create(username=username,
-                                                   email=email)
+        user, created = User.objects.get_or_create(
+            username=username,
+            email=email
+        )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             'Ваш код для получения токена. ',
@@ -160,8 +167,10 @@ class UsersTokenObtain(APIView):
         confirmation_code = serializer.data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
         if default_token_generator.check_token(user, confirmation_code):
-            return Response(get_access_token(user),
-                            status=status.HTTP_200_OK)
+            return Response(
+                get_access_token(user),
+                status=status.HTTP_200_OK
+            )
         raise serializers.ValidationError({'confirmation_code': 'is invalid'})
 
 
@@ -178,8 +187,11 @@ class UserViewSet(ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,))
     def me(self, request):
         if request.method == 'PATCH':
-            serializer = self.get_serializer(request.user, data=request.data,
-                                             partial=True)
+            serializer = self.get_serializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save(role=request.user.role)
             return Response(serializer.data, status=status.HTTP_200_OK)

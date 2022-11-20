@@ -4,8 +4,15 @@ import os
 from django.core.management.base import BaseCommand
 
 from api_yamdb.settings import BASE_DIR
-from reviews.models import (Category, Genre, Title, GenreTitle,
-                            Comment, Review, User)
+from reviews.models import (
+    Category,
+    Genre,
+    Title,
+    GenreTitle,
+    Comment,
+    Review,
+    User
+)
 
 
 DATA_FILES_DIR = os.path.join(BASE_DIR, 'static/data/')
