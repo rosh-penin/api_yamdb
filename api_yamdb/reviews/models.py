@@ -66,7 +66,7 @@ class Title(models.Model):
         blank=True
     )
 
-    class Meta():
+    class Meta:
         ordering = ('name',)
         constraints = [
             models.UniqueConstraint(

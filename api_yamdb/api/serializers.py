@@ -1,8 +1,5 @@
-from datetime import datetime
-
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models import Avg
 from rest_framework import serializers, validators
 
 from reviews.models import Category, Genre, Title, Review, Comment
