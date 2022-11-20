@@ -4,6 +4,12 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from api_yamdb.settings import (
+    MAX_SCORE_VALUE,
+    MIN_SCORE_VALUE,
+    STR_FUNC_SYMBOL_COUNT
+)
+
 User = get_user_model()
 
 
@@ -89,7 +95,7 @@ class GenreTitle(models.Model):
         related_name='genretitle'
     )
 
-    class Meta():
+    class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=('genre', 'title'),
@@ -125,8 +131,8 @@ class Review(BaseModel):
     score = models.IntegerField(
         'Оценка',
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(MIN_SCORE_VALUE),
+            MaxValueValidator(MAX_SCORE_VALUE)
         ],
         help_text='Оценка произведения от 1 до 10'
     )
@@ -137,9 +143,6 @@ class Review(BaseModel):
         verbose_name='Произведение'
     )
 
-    def __str__(self):
-        return self.text[:20]
-
     class Meta(BaseModel.Meta):
         constraints = [
             models.UniqueConstraint(
@@ -147,6 +150,9 @@ class Review(BaseModel):
                 name='double_review_constraint'
             ),
         ]
+
+    def __str__(self):
+        return self.text[:STR_FUNC_SYMBOL_COUNT]
 
 
 class Comment(BaseModel):
