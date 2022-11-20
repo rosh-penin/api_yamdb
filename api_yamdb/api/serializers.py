@@ -1,5 +1,4 @@
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.db.models import Avg
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Title, Review, Comment
@@ -27,20 +26,12 @@ class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
     description = serializers.CharField(required=False)
-    rating = serializers.SerializerMethodField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating',
                   'description', 'genre', 'category')
-
-    def get_rating(self, obj):
-        """Score field is calculated to show average score."""
-        score = obj.reviews.aggregate(Avg('score')).get('score__avg')
-        if score is not None:
-            score = round(score, 1)
-
-        return score
 
 
 class TitleSerializerPostUpdate(TitleSerializer):
