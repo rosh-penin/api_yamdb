@@ -1,14 +1,5 @@
 # api_yamdb
-api_yamdb
-New command:
-```sh
-python manage.py import_csv
-```
-Will load all allowed .csv files from static/data directory (relative to django project base dir)
-
-
-
-
+### API для базы данных различных произведений.
 
 ### Как запустить проект:
 
@@ -35,17 +26,13 @@ source venv/bin/activate
 Установить зависимости из файла requirements.txt:
 
 ```
-python3 -m pip install --upgrade pip
-```
-
-```
 pip install -r requirements.txt
 ```
 
-cd yatube_api
-
 Выполнить миграции:
-
+```
+cd yatube_api
+```
 ```
 python3 manage.py migrate
 ```
